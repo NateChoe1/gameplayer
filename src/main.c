@@ -65,10 +65,9 @@ char handleInput(struct input_event event) {
 		printf("This binding has already been set, ending the binding process.\n");
 		currentlyMapping = FALSE;
 
-		for (int i = 0; i < KEYCODE_COUNT; i++) {
+		for (int i = 0; i < KEYCODE_COUNT; i++)
 			if (mapping[i] != i)
 				ioctl(uinputfd, UI_SET_KEYBIT, mapping[i]);
-		}
 		sleep(1);
 		struct uinput_setup usetup;
 		usetup.id.bustype = BUS_USB;
@@ -111,6 +110,10 @@ int main(int argc, char **argv) {
 	currentlyMappedCharacter = SETTING_VALUE;
 	currentlyMapping = TRUE;
 	uinputfd = open("/dev/uinput", O_WRONLY | O_NONBLOCK);
+	if (uinputfd < 0) {
+		printf("You don't have sufficient privileges for this operation. Try running as root?\n");
+		exit(1);
+	}
 	ioctl(uinputfd, UI_SET_EVBIT, EV_KEY);
 	reporter.type = EV_SYN;
 	reporter.code = SYN_REPORT;
